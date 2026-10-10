@@ -491,6 +491,10 @@ footer{
       </div>
     </div>
       <div class="subtle">What you hold today; leave empty if none. "Days" = days of maintenance your GMT covers (as on GoMining's Maintenance Discount page). Type GMT or days and the other updates.</div>
+      <div class="pricewarn" id="costWarn" hidden>
+        <span id="costWarnText"></span>
+        <button type="button" onclick="resetCostConstants()">Reset to standard</button>
+      </div>
     </div>
 
     <div class="market-settings">
@@ -1724,6 +1728,7 @@ function renderShared(S){
   set('gmtPriceOut', "$"+fmt(S.gmtPrice,4));
   set('kwhOut', "$"+fmt(S.kwh,4));
   set('svcConstOut', "$"+fmt(S.svcConst,4));
+  updateCostWarning(S);
   set('d1Out', fmt(S.d1*100,1)+"%");
   set('d2Out', fmt(S.d2*100,1)+"%");
   set('d3Out', fmt(S.d3*100,1)+"%");
@@ -1736,6 +1741,27 @@ function renderShared(S){
   set('d1Info', S.tier >= MAX_TIER
     ? fmt(S.daysCovered,0)+" days covered — maximum discount."
     : fmt(S.daysCovered,0)+" days covered — "+fmt(Math.max(0,(S.tier+1)*TIER_DAYS-S.daysCovered),0)+" more days for the next 1%.");
+}
+
+// Power Rate and Service Constant are GoMining's own platform constants, not your utility bill.
+// If either was changed (a typo, or a number typed into the wrong box), every day / GMT figure
+// is off by a large factor, so say so right where the days are shown.
+const STD_KWH = 0.05, STD_SVC = 0.0089;
+function updateCostWarning(S){
+  const bad = [];
+  if(Math.abs(S.kwh - STD_KWH) > 1e-9) bad.push('Power Rate is $'+fmt(S.kwh,4)+'/kWh (standard is $'+fmt(STD_KWH,4)+')');
+  if(Math.abs(S.svcConst - STD_SVC) > 1e-9) bad.push('Service Constant is $'+fmt(S.svcConst,4)+' (standard is $'+fmt(STD_SVC,4)+')');
+  const el = document.getElementById('costWarn');
+  if(!el) return;
+  el.hidden = bad.length === 0;
+  document.getElementById('costWarnText').textContent = bad.length
+    ? '⚠ '+bad.join(' and ')+'. Under "Market settings" below. Days and GMT figures will not match the GoMining app unless these are the platform values.'
+    : '';
+}
+function resetCostConstants(){
+  document.getElementById('kwh').value = STD_KWH;
+  document.getElementById('svcConst').value = STD_SVC;
+  calc();
 }
 
 // ---- Weekly rewards from the lock + GMT saved by the discounts (shared, shown on every tab) ----
