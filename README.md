@@ -10,7 +10,7 @@ The page opens on **Traditional**. The open tab is kept in the URL (`#traditiona
 
 **Colors in every Results panel:** a GMT category you meet or exceed is **green**; one that is under its required amount is **red**. Anything that is only information stays neutral.
 
-**[Live site →](https://jdobbsclt.github.io/gomining-flywheel-calculator/)**
+**[Live site →](https://hypercaffiumlabs.github.io/gomining-flywheel-calculator/)**
 
 ## Live prices
 
@@ -103,7 +103,7 @@ Implements Audacity's variation, in the same Results format (headline, four stat
 
 ## The automatically-updated files
 
-Both files are kept current by a nightly job in [`gomining-servicetap`](https://github.com/jdobbsclt/gomining-servicetap), which already loads GoMining's dashboard every night.
+Both files are kept current by a nightly job in [`gomining-servicetap`](https://github.com/hypercaffiumlabs/gomining-servicetap), which already loads GoMining's dashboard every night.
 
 **`mining-mode.json`** — the extra Mining-mode discount, set each week by the veGOMINING vote:
 
