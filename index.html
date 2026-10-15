@@ -2200,6 +2200,9 @@ function importOldSite(){
   try{ d = JSON.parse(decodeURIComponent(escape(atob(q.replace(/-/g,'+').replace(/_/g,'/'))))); }catch(err){ return 0; }
   const incoming = cleanProfiles(d);
   if(!incoming.length) return 0;
+  // Anyone can build a link like this, so ask before adding anything to the visitor's list.
+  const list = incoming.slice(0,10).map(p=>p.name).join(', ') + (incoming.length > 10 ? ', ...' : '');
+  if(!confirm('This calculator moved here from jdobbsclt.github.io. Bring over '+incoming.length+' saved setup'+(incoming.length === 1 ? '' : 's')+' from the old address?\n\n'+list)) return 0;
   // A brand-new visitor here only has the empty placeholder setup: replace it outright.
   const fresh = store.profiles.length === 1 && !store.profiles[0].v;
   if(fresh) store.profiles = [];
