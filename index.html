@@ -2151,26 +2151,76 @@ function setPfStatus(text, ms){
   if(ms) setTimeout(()=>{ if(el.textContent === text) el.textContent = storageOk ? '' : NO_STORAGE_MSG; }, ms);
 }
 
+// Keeps only well-formed profiles (named, with a values object), max 50, no duplicate names.
+function cleanProfiles(d){
+  if(!d || !Array.isArray(d.profiles)) return [];
+  const seen = new Set();
+  const ps = [];
+  d.profiles.forEach(p=>{
+    if(!p || typeof p.name !== 'string' || !p.name || !p.v || typeof p.v !== 'object') return;
+    const name = p.name.slice(0,40);
+    if(seen.has(name) || ps.length >= 50) return;
+    seen.add(name);
+    ps.push({name, v:p.v});
+  });
+  return ps;
+}
 function loadStore(){
   try{
     const raw = localStorage.getItem(SAVE_KEY);
     if(!raw) return;
     const d = JSON.parse(raw);
-    if(!d || !Array.isArray(d.profiles)) return;
-    const seen = new Set();
-    const ps = [];
-    d.profiles.forEach(p=>{
-      if(!p || typeof p.name !== 'string' || !p.name || !p.v || typeof p.v !== 'object') return;
-      const name = p.name.slice(0,40);
-      if(seen.has(name) || ps.length >= 50) return;
-      seen.add(name);
-      ps.push({name, v:p.v});
-    });
+    const ps = cleanProfiles(d);
     if(ps.length){
       store.profiles = ps;
       store.current = ps.some(p=>p.name === d.current) ? d.current : ps[0].name;
     }
   }catch(err){ /* unreadable or blocked storage: start from the defaults; the next save replaces it */ }
+}
+
+// The calculator used to live at jdobbsclt.github.io. That address now forwards here and passes the
+// setups saved there after the # as "#<tab>!import=<data>" (browsers keep saved data per address, so
+// they can't move on their own; the # part never leaves the browser). takeOldSiteImport() runs
+// before the tabs read the hash and strips it back to "#<tab>". importOldSite() merges: same name +
+// same values = already here; same name + different values = kept as "<name> (old site)".
+// Returns how many were added. Untrusted input, like a share link.
+let oldSiteImport = null;
+function takeOldSiteImport(){
+  const i = location.hash.indexOf('!import=');
+  if(i < 0) return;
+  oldSiteImport = location.hash.slice(i + 8);
+  const tab = location.hash.slice(1, i);
+  try{ history.replaceState(null, '', location.pathname + location.search + (tab ? '#'+tab : '')); }catch(err){ /* file:// or sandboxed */ }
+}
+function importOldSite(){
+  const q = oldSiteImport;
+  oldSiteImport = null;
+  if(!q || q.length > 200000) return 0;
+  let d = null;
+  try{ d = JSON.parse(decodeURIComponent(escape(atob(q.replace(/-/g,'+').replace(/_/g,'/'))))); }catch(err){ return 0; }
+  const incoming = cleanProfiles(d);
+  if(!incoming.length) return 0;
+  // A brand-new visitor here only has the empty placeholder setup: replace it outright.
+  const fresh = store.profiles.length === 1 && !store.profiles[0].v;
+  if(fresh) store.profiles = [];
+  let added = 0;
+  incoming.forEach(p=>{
+    if(store.profiles.length >= 50) return;
+    const same = store.profiles.find(x=>x.name === p.name);
+    if(same && JSON.stringify(same.v) === JSON.stringify(p.v)) return;
+    let name = p.name;
+    if(same){
+      name = (p.name.slice(0,29) + ' (old site)');
+      if(store.profiles.some(x=>x.name === name)) return;
+    }
+    store.profiles.push({name, v:p.v});
+    added++;
+  });
+  if(fresh){
+    store.current = store.profiles.some(p=>p.name === d.current) ? d.current : store.profiles[0].name;
+  }
+  if(added) writeStore();
+  return added;
 }
 function writeStore(){
   try{
@@ -2242,6 +2292,7 @@ function shareLink(){
 function initSaved(){
   DEFAULT_SETUP = snapshotSetup();        // the page as shipped, taken before anything is applied
   loadStore();
+  const imported = importOldSite();
   let fromLink = null;
   const q = new URLSearchParams(location.search).get('p');
   if(q && q.length < 4000){
@@ -2258,6 +2309,7 @@ function initSaved(){
     applySetup(currentProfile().v);
   }
   renderProfileBar();
+  if(imported) setPfStatus('Brought over '+imported+' saved setup'+(imported === 1 ? '' : 's')+' from the old address. Pick one in the list.', 8000);
 
   $id('profileSel').addEventListener('change', e=>switchProfile(e.target.value));
   $id('pfNew').addEventListener('click', ()=>{
@@ -2311,6 +2363,7 @@ function initSaved(){
   saveReady = true;
 }
 
+takeOldSiteImport();
 initTabs();
 initMiners();
 initSaved();
