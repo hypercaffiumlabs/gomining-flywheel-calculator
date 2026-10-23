@@ -28,6 +28,17 @@ Not saved, on purpose: the GMT and BTC prices (live), the Mining mode discount a
 
 My Farm (TH, efficiency, GMT price, power rate, service constant), the maintenance discount stack, and **My GMT Position**: the GMT you actually hold, locked and liquid (or the same amounts as days of maintenance cover; type either and the other updates). The boxes start empty, so a new visitor sees what they need to acquire. Each target on the Traditional and Modified tabs shows its worth in GMT next to it. Every tab reads the same numbers, so you enter them once.
 
+## Return on Investment (below "Where You Stand Today", on every tab)
+
+How long your farm takes to pay for itself, at today's prices. Needs your daily pool reward (My Farm).
+
+- **Inputs:** what you paid for miners and for GMT, in USD. Leave either blank to use today's value instead (TH × the TH ask price from the Modified tab; GMT held × GMT price).
+- **Headline:** payback time = invested ÷ yearly profit. Green if you're profitable; "Never" in red if you're losing money.
+- **Stat cards:** total invested, yearly profit (365 × the "Total profit" row above, split into mining and lock rewards), ROI per year, and the **break-even BTC price** where mining profit hits zero (maintenance per day ÷ pool reward in BTC).
+- **If BTC moves:** yearly profit, ROI and payback at −50%, −25%, today, +25%, +50%, and at your BTC cutoff from the Modified tab.
+- **Buying one more TH:** cost per TH reinvesting directly (with the VIP bonus) vs on the marketplace via GMT (after the 2.25% fee), each against the mining profit one TH earns a year.
+- **Caveats, shown on the page:** it assumes today's BTC price, GMT price and pool reward per TH hold. They won't: network difficulty rises, which shrinks the BTC each TH earns, so payback is a best case. The extra-TH rows ignore that more TH needs more GMT to keep the same token discount. Resale value of miners and GMT isn't counted.
+
 ## What the OPEX 125% tab does
 
 You enter your hashpower, efficiency, power/service costs, your VIP tier and service streak, and the GMT you hold **locked** and **liquid** (as "days covered" from GoMining's Maintenance Discount page, or as GMT — whichever you edit last is kept and the other is derived). The calculator then works out:

@@ -303,7 +303,7 @@ footer{
 .ck.info{background:var(--violet-line);}
 
 #posPanel{grid-column:1/-1;}
-#rewardsPanel{grid-column:1/-1;}
+#rewardsPanel, #roiPanel{grid-column:1/-1;}
 .stat-grid.three{grid-template-columns:repeat(3,1fr);}
 @media(max-width:600px){.stat-grid.three{grid-template-columns:1fr;}}
 .posgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
@@ -573,6 +573,77 @@ footer{
         <code>profit = pool reward × BTC price − maintenance − reinvest fee (2.25% of profit, approximate) + lock rewards
 discount saving = daily maintenance at 0% × discount rate
 lock rewards = POOL × v ÷ (T_others + v),  v = locked GMT × lock-period factor</code>
+      </div>
+    </details>
+  </div>
+
+  <!-- RETURN ON INVESTMENT -->
+  <div class="panel" id="roiPanel">
+    <h2>Return on Investment</h2>
+    <div class="row2 align-labels">
+      <div class="field">
+        <label>Paid for miners <b>USD</b></label>
+        <input type="number" id="roiMinerUsd" value="" step="any" min="0" placeholder="today's value" oninput="calc()">
+        <div class="subtle" id="roiMinerNote">—</div>
+      </div>
+      <div class="field">
+        <label>Paid for GMT <b>USD</b></label>
+        <input type="number" id="roiGmtUsd" value="" step="any" min="0" placeholder="today's value" oninput="calc()">
+        <div class="subtle" id="roiGmtNote">—</div>
+      </div>
+    </div>
+
+    <div class="headline" id="roiHeadline">
+      <div class="htxt">
+        <h3 id="roiHeadTitle">Payback</h3>
+        <p id="roiSub">—</p>
+      </div>
+      <div class="hval" id="roiHval"><span id="roiHeadVal">—</span><span class="unit" id="roiHeadUnit"></span></div>
+    </div>
+
+    <div class="stat-grid">
+      <div class="stat">
+        <div class="lbl">Total Invested</div>
+        <div class="val" id="roiInvested">—</div>
+        <div class="sub" id="roiInvestedSub">—</div>
+      </div>
+      <div class="stat">
+        <div class="lbl">Yearly Profit</div>
+        <div class="val" id="roiYearly">—</div>
+        <div class="sub" id="roiYearlySub">—</div>
+      </div>
+      <div class="stat">
+        <div class="lbl">ROI per Year</div>
+        <div class="val" id="roiPct">—</div>
+        <div class="sub" id="roiPctSub">—</div>
+      </div>
+      <div class="stat">
+        <div class="lbl">Break-even BTC</div>
+        <div class="val" id="roiBreakeven">—</div>
+        <div class="sub" id="roiBreakevenSub">—</div>
+      </div>
+    </div>
+
+    <div class="table-wrap"><table class="compare-table">
+      <tr><th>If BTC moves</th><th>BTC price</th><th>Yearly profit</th><th>ROI / year</th><th>Payback</th></tr>
+      <tbody id="roiBtcRows"></tbody>
+    </table></div>
+
+    <div class="table-wrap"><table class="compare-table">
+      <tr><th>Buying one more TH</th><th>Cost per TH</th><th>Profit per TH / year</th><th>ROI / year</th><th>Payback</th></tr>
+      <tbody id="roiThRows"></tbody>
+    </table></div>
+    <div class="subtle" id="roiNote">—</div>
+
+    <details class="formula">
+      <summary>How this is calculated</summary>
+      <div class="formula-body">
+        <code>invested     = paid for miners + paid for GMT   (blank = TH × today's ask, GMT held × GMT price)
+yearly profit = 365 × total profit per day  (same as "Where You Stand Today")
+ROI / year    = yearly profit ÷ invested
+payback       = invested ÷ yearly profit
+break-even BTC = maintenance per day ÷ pool reward (BTC per day)   (mining profit = 0)
+one more TH   = cost per TH ÷ (mining profit per day ÷ TH × 365)</code>
       </div>
     </details>
   </div>
@@ -1764,6 +1835,21 @@ function resetCostConstants(){
   calc();
 }
 
+// Profit per day in USD at a given BTC price, or null when no pool reward is entered. Shared by
+// "Where You Stand Today" and the ROI panel so the two can never disagree.
+function dailyProfit(S, btcPrice){
+  const poolBtc = parseFloat(document.getElementById('poolRewardBtc').value);
+  if(!(poolBtc > 0)) return null;
+  const tOthers = Math.max(0, lockModel.totalVotes - S.lockedGMT*S.f);
+  const lock = modelWeekly(S.lockedGMT, S.f, tOthers, lockModel.weeklyPool)/7*S.gmtPrice;
+  const maint = S.weeklyOpexGMT/7*S.gmtPrice;
+  const earn = poolBtc*btcPrice;
+  const preFee = earn - maint;
+  const fee = (document.getElementById('reinvestFee').value === 'yes' && preFee > 0) ? preFee*GMT_REINVEST_FEE : 0;
+  const mine = preFee - fee;
+  return {poolBtc, earn, maint, fee, mine, lock, total: mine + lock};
+}
+
 // ---- Weekly rewards from the lock + GMT saved by the discounts (shared, shown on every tab) ----
 function renderRewards(S){
   const {gmtPrice, f, lockedGMT, perDay0, d1, d2, d3, d4, totalDiscount} = S;
@@ -1780,7 +1866,7 @@ function renderRewards(S){
   const maintDayUsd = maintDayGMT*gmtPrice;
   const lockDayGMT = lockWeekGMT/7;
   const lockDayUsd = lockDayGMT*gmtPrice;
-  const poolBtc = parseFloat(el('poolRewardBtc').value);
+  const pr = dailyProfit(S, S.mod.btcPrice);
   const td = 'style="font-family:var(--sans);"';
   const signed = v => (v < 0 ? '−' : '+') + usd(Math.abs(v));
   const gmtCell = v => (v < 0 ? '−' : '+') + fmt(Math.abs(v),2);
@@ -1796,16 +1882,12 @@ function renderRewards(S){
   el('rwDiscUsdHead').innerHTML = 'USD <span class="dsk">saved </span>/ '+pname;
 
   let html, totalDay = null;
-  if(poolBtc > 0){
-    const earnDayUsd = poolBtc*S.mod.btcPrice;
-    const preFee = earnDayUsd - maintDayUsd;
-    const feeDayUsd = (el('reinvestFee').value === 'yes' && preFee > 0) ? preFee*GMT_REINVEST_FEE : 0;
-    const mineProfit = preFee - feeDayUsd;
-    totalDay = mineProfit + lockDayUsd;
-    html = prow('Mining earnings', earnDayUsd, null)
+  if(pr){
+    totalDay = pr.total;
+    html = prow('Mining earnings', pr.earn, null)
       + prow('Maintenance after discounts', -maintDayUsd, -maintDayGMT)
-      + (feeDayUsd > 0 ? prow('Reinvest fee ('+fmt(GMT_REINVEST_FEE*100,2)+'%)', -feeDayUsd, null) : '')
-      + prow('Profit from mining', mineProfit, null, true)
+      + (pr.fee > 0 ? prow('Reinvest fee ('+fmt(GMT_REINVEST_FEE*100,2)+'%)', -pr.fee, null) : '')
+      + prow('Profit from mining', pr.mine, null, true)
       + prow(lockLabel, lockDayUsd, lockDayGMT)
       + prow('Total profit', totalDay, null, true);
   }else{
@@ -1828,6 +1910,100 @@ function renderRewards(S){
   el('rwSaveRows').innerHTML =
       row('Token', d1) + row('VIP tier', d3) + row('Service streak', d2) + row('Mining mode', d4)
     + row('Total', totalDiscount, true);
+}
+
+// ---- Return on investment (shared, shown on every tab) ----
+// Payback and yearly ROI on what you put in (miners + GMT), at today's prices and pool reward.
+// A blank "paid" box falls back to today's value, so it reads as "return on what this farm is worth now".
+function paybackTxt(years){
+  if(!isFinite(years) || years <= 0) return 'never';
+  return years < 1 ? fmt(years*12,1)+' months' : fmt(years,1)+' years';
+}
+function renderRoi(S){
+  const $ = id => document.getElementById(id);
+  const btc = S.mod.btcPrice;
+  const minerValue = S.th*S.mod.thPrice, gmtValue = S.totalGmt*S.gmtPrice;
+  const paid = id => { const v = parseFloat($(id).value); return isFinite(v) && v >= 0 ? v : null; };
+  const minerPaid = paid('roiMinerUsd'), gmtPaid = paid('roiGmtUsd');
+  const minerUsd = minerPaid === null ? minerValue : minerPaid;
+  const gmtUsd = gmtPaid === null ? gmtValue : gmtPaid;
+  const invested = minerUsd + gmtUsd;
+  $('roiMinerNote').textContent = (minerPaid === null ? 'Using' : 'Today\'s value')+' '+usd(minerValue)+' ('+fmt(S.th,2)+' TH × '+usd(S.mod.thPrice)+' ask).';
+  $('roiGmtNote').textContent = (gmtPaid === null ? 'Using' : 'Today\'s value')+' '+usd(gmtValue)+' ('+fmt(S.totalGmt,0)+' GMT × $'+fmt(S.gmtPrice,4)+').';
+
+  $('roiInvested').textContent = usd(invested);
+  $('roiInvestedSub').textContent = usd(minerUsd)+' miners + '+usd(gmtUsd)+' GMT';
+
+  const pr = dailyProfit(S, btc);
+  const head = $('roiHeadVal'), unit = $('roiHeadUnit'), sub = $('roiSub');
+  const clear = (msg) => {
+    ['roiYearly','roiPct','roiBreakeven'].forEach(id=>{ $(id).textContent = '—'; setState($(id), null); });
+    $('roiYearlySub').textContent = '—'; $('roiPctSub').textContent = '—'; $('roiBreakevenSub').textContent = '—';
+    head.textContent = '—'; unit.textContent = ''; sub.textContent = msg;
+    setHead('roiHeadline','roiHval', null);
+    $('roiBtcRows').innerHTML = $('roiThRows').innerHTML = '<tr><td colspan="5" style="font-family:var(--sans);">'+msg+'</td></tr>';
+    $('roiNote').textContent = '';
+  };
+  if(!pr){ clear('Enter your daily pool reward (My Farm) to see your return.'); return; }
+  if(!(invested > 0)){ clear('Enter what you paid, or your hashpower and GMT, to see your return.'); return; }
+
+  const yearly = pr.total*365;
+  const roi = yearly/invested;
+  const years = yearly > 0 ? invested/yearly : Infinity;
+  const ok = yearly > 0;
+
+  const pb = paybackTxt(years);
+  if(isFinite(years)){
+    const parts = pb.split(' ');
+    head.textContent = parts[0]; unit.textContent = ' '+parts[1];
+  }else{ head.textContent = 'Never'; unit.textContent = ''; }
+  setHead('roiHeadline','roiHval', ok);
+  sub.textContent = ok
+    ? 'At today\'s prices your '+usd(invested)+' earns '+usd(yearly)+' a year, so it pays for itself in '+pb+'. Your miners and GMT keep their resale value on top of that.'
+    : 'At today\'s prices you lose '+usd(-yearly)+' a year, so the investment never pays back. See the break-even BTC price below.';
+
+  $('roiYearly').textContent = (yearly < 0 ? '−' : '')+usd(Math.abs(yearly));
+  setState($('roiYearly'), ok);
+  $('roiYearlySub').textContent = 'mining '+usd(pr.mine*365)+' + lock '+usd(pr.lock*365);
+  $('roiPct').textContent = fmt(roi*100,1)+'%';
+  setState($('roiPct'), ok);
+  $('roiPctSub').textContent = 'payback '+pb;
+
+  const breakeven = pr.maint/pr.poolBtc;
+  $('roiBreakeven').textContent = '$'+fmt(breakeven,0);
+  setState($('roiBreakeven'), btc >= breakeven);
+  $('roiBreakevenSub').textContent = btc >= breakeven
+    ? fmt((1 - breakeven/btc)*100,0)+'% below today\'s $'+fmt(btc,0)
+    : fmt((breakeven/btc - 1)*100,0)+'% above today\'s $'+fmt(btc,0);
+
+  const td = 'style="font-family:var(--sans);"';
+  const row = (label, price) => {
+    const p = dailyProfit(S, price), y = p.total*365;
+    return '<tr><td '+td+'>'+label+'</td><td>$'+fmt(price,0)+'</td>'
+      + tdc((y < 0 ? '−' : '')+usd(Math.abs(y)), y > 0)+tdc(fmt(y/invested*100,1)+'%', y > 0)
+      + '<td>'+paybackTxt(y > 0 ? invested/y : Infinity)+'</td></tr>';
+  };
+  $('roiBtcRows').innerHTML = [-0.5,-0.25,0,0.25,0.5].map(m =>
+    row(m === 0 ? '<b>Today</b>' : (m > 0 ? '+' : '−')+fmt(Math.abs(m)*100,0)+'%', btc*(1+m))).join('')
+    + (S.mod.btcCutoff > 0 ? row('Your BTC cutoff (Modified tab)', S.mod.btcCutoff) : '');
+
+  // One more TH earns the farm's mining profit per TH (pool reward and maintenance both scale with TH).
+  const perThYear = S.th > 0 ? pr.mine/S.th*365 : 0;
+  const bonus = reinvestBonus(S.d3*100);
+  const ask = S.mod.thPrice;
+  const thRow = (label, cost) => {
+    const r = cost > 0 ? perThYear/cost : 0;
+    return '<tr><td '+td+'>'+label+'</td><td>'+usd(cost)+'</td>'
+      + tdc((perThYear < 0 ? '−' : '')+usd(Math.abs(perThYear)), perThYear > 0)+tdc(fmt(r*100,1)+'%', perThYear > 0)
+      + '<td>'+paybackTxt(perThYear > 0 ? cost/perThYear : Infinity)+'</td></tr>';
+  };
+  $('roiThRows').innerHTML = ask > 0 && S.th > 0
+    ? thRow('Reinvest directly (ask, +'+fmt(bonus*100,0)+'% VIP bonus)', ask/(1 + bonus))
+      + thRow('Marketplace via GMT ('+fmt(S.mod.marketDiscount*100,0)+'% below ask, '+fmt(GMT_REINVEST_FEE*100,2)+'% fee)', ask*(1 - S.mod.marketDiscount)/(1 - GMT_REINVEST_FEE))
+    : '<tr><td colspan="5" '+td+'>Enter your hashpower and a TH price to see this.</td></tr>';
+
+  $('roiNote').textContent = 'Assumes today\'s BTC price, GMT price and pool reward per TH hold for the whole period. They won\'t: network difficulty rises over time, which shrinks the BTC each TH earns, so treat payback as a best case. '
+    + 'One more TH is mining only (no extra lock rewards) and ignores that more TH needs more GMT to keep the same token discount. TH ask and marketplace discount are set on the Modified tab.';
 }
 
 // ---- Tab: OPEX 125% Flywheel ------------------------------------------------------------
@@ -1952,6 +2128,7 @@ function calc(){
   const S = computeShared(readInputs());
   renderShared(S);
   renderRewards(S);
+  renderRoi(S);
   renderOpex(S);
   renderTraditional(S);
   renderModified(S);
@@ -2095,7 +2272,7 @@ function initMiners(){
 const SAVE_KEY = 'gmtFlywheel.saved.v1';
 const SAVE_NUM_IDS = ['th','watt','kwh','svcConst','lockedGmt','liquidGmt','lockedDays','liquidDays',
   'tradLocked','tradUnlocked','tradKeep','modLocked','modUnlocked','modMin','mktDiscount','btcCutoff',
-  'greedyGrowth','target','poolRewardBtc'];
+  'greedyGrowth','target','poolRewardBtc','roiMinerUsd','roiGmtUsd'];
 const SAVE_SEL_IDS = ['d2','d3','period','reinvestFee','rewardPeriod'];
 const SAVE_NUM_RE = /^-?\d{0,15}\.?\d{0,15}$/;
 const DEFAULT_PROFILE_NAME = 'My setup';
