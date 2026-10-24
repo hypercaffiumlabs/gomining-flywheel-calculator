@@ -4,29 +4,38 @@
 <meta charset="UTF-8">
 <title>GMT Flywheel Calculators — Traditional, Modified &amp; OPEX 125%</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
 :root{
-  --bg:#12161B;
-  --panel:#1A2029;
-  --panel2:#20272F;
-  --border:#2A323C;
+  --bg:#0B0817;
+  --bg-glow:radial-gradient(ellipse 120% 70% at 50% -10%, #241A42 0%, #0B0817 55%);
+  --panel:rgba(255,255,255,0.045);
+  --panel2:rgba(255,255,255,0.035);
+  --border:rgba(165,139,255,0.16);
   --amber:#E2952F;
   --violet:#4D00FF;        /* GoMining brand purple: solid fills */
   --violet-line:#7540EF;   /* GoMining lighter purple: outlines and dots */
   --violet-text:#A98BFF;   /* lightened tint of the brand purple: readable text on dark */
   --green:#4FAE7C;
   --red:#D14F43;
-  --text:#EDEDE3;
-  --dim:#8B94A0;
-  --mono:'SF Mono','Consolas','Menlo',monospace;
-  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --text:#F3F0FF;
+  --dim:#9A90C2;
+  --mono:'Space Grotesk',-apple-system,BlinkMacSystemFont,sans-serif;
+  --sans:'IBM Plex Sans',-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
+  --r-card:20px;
+  --r-stat:14px;
+  --r-input:10px;
 }
 *{box-sizing:border-box;}
 body{
   margin:0;
-  background:var(--bg);
+  background:var(--bg-glow),var(--bg);
+  background-attachment:fixed;
   color:var(--text);
   font-family:var(--sans);
+  font-variant-numeric:tabular-nums;
   padding:20px;
   line-height:1.4;
 }
@@ -57,8 +66,11 @@ header p{
 .panel{
   background:var(--panel);
   border:1px solid var(--border);
-  border-radius:10px;
+  border-radius:var(--r-card);
   padding:16px 18px;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
+  box-shadow:0 24px 60px -24px rgba(77,0,255,0.35), inset 0 1px 0 rgba(255,255,255,0.06);
 }
 .panel h2{
   font-size:12px;
@@ -93,7 +105,7 @@ header p{
   border:1px solid var(--border);
   color:var(--text);
   padding:7px 9px;
-  border-radius:6px;
+  border-radius:var(--r-input);
   font-family:var(--mono);
   font-size:13px;
 }
@@ -105,7 +117,7 @@ header p{
   border:1px solid var(--border);
   color:var(--text);
   padding:7px 9px;
-  border-radius:6px;
+  border-radius:var(--r-input);
   font-family:var(--mono);
   font-size:13px;
 }
@@ -121,7 +133,7 @@ header p{
   margin-top:6px;
   padding:8px 10px;
   background:var(--panel2);
-  border-radius:6px;
+  border-radius:var(--r-input);
   display:flex;
   justify-content:space-between;
   font-family:var(--mono);
@@ -142,7 +154,7 @@ header p{
 .stat{
   background:var(--panel2);
   border:1px solid var(--border);
-  border-radius:8px;
+  border-radius:var(--r-stat);
   padding:12px 14px;
 }
 .stat .lbl{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:6px;}
@@ -150,9 +162,9 @@ header p{
 .stat .sub{font-size:11px;color:var(--dim);margin-top:4px;}
 
 .headline{
-  background:linear-gradient(135deg,#20272F,#1A2029);
+  background:linear-gradient(135deg, rgba(117,64,239,0.16), rgba(77,0,255,0.05));
   border:1px solid var(--violet-line);
-  border-radius:10px;
+  border-radius:var(--r-card);
   padding:18px 20px;
   display:flex;
   justify-content:space-between;
@@ -166,20 +178,20 @@ header p{
 .headline .hval{font-family:var(--mono);font-size:34px;font-weight:700;color:var(--violet-text);text-align:right;}
 .headline .hval .unit{font-size:14px;color:var(--dim);font-weight:400;}
 
-.gap-bar-wrap{margin-top:4px;}
-.gap-bar{
-  height:10px;
-  background:var(--panel2);
-  border-radius:5px;
-  overflow:hidden;
-  border:1px solid var(--border);
-}
-.gap-bar-fill{
-  height:100%;
-  background:linear-gradient(90deg,var(--green),var(--amber));
-  transition:width 0.15s;
-}
-.gap-bar-fill.over{background:linear-gradient(90deg,var(--green),#3d9c6b);}
+.donut-pair{display:flex;gap:28px;flex-wrap:wrap;margin:4px 0 20px;}
+.donut{display:flex;align-items:center;gap:14px;flex:0 0 auto;}
+.donut svg{width:84px;height:84px;flex:none;}
+.donut-track{fill:none;stroke:var(--panel2);stroke-width:10;}
+.donut-ring{fill:none;stroke:var(--violet-line);stroke-width:10;stroke-linecap:round;
+  transition:stroke-dashoffset .6s cubic-bezier(.4,0,.2,1);}
+.donut-ring.ok{stroke:var(--green);}
+.donut-ring.bad{stroke:var(--red);}
+.donut-txt{display:flex;flex-direction:column;}
+.donut-cap{font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:2px;}
+.donut-txt b{font-family:var(--mono);font-size:22px;font-weight:700;color:var(--text);line-height:1.15;}
+.donut-sub{font-size:11px;color:var(--dim);margin-top:2px;}
+@media(max-width:480px){.donut-pair{gap:16px;}.donut{flex:1 1 140px;}}
+@media(prefers-reduced-motion: reduce){.donut-ring{transition:none;}}
 
 .grid > *{min-width:0;}
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin-top:8px;}
@@ -224,8 +236,10 @@ details.formula{
   grid-column:1/-1;
   background:var(--panel);
   border:1px solid var(--border);
-  border-radius:10px;
+  border-radius:var(--r-card);
   padding:14px 18px;
+  backdrop-filter:blur(18px);
+  -webkit-backdrop-filter:blur(18px);
 }
 details.formula summary{
   cursor:pointer;font-size:12px;text-transform:uppercase;letter-spacing:1px;
@@ -234,7 +248,7 @@ details.formula summary{
 .formula-body{margin-top:14px;font-size:13px;color:var(--dim);}
 .formula-body code{
   display:block;background:var(--panel2);border:1px solid var(--border);
-  border-radius:6px;padding:8px 10px;margin:6px 0 12px 0;color:var(--text);
+  border-radius:var(--r-input);padding:8px 10px;margin:6px 0 12px 0;color:var(--text);
   font-family:var(--mono);font-size:12px;overflow-x:auto;
 }
 .formula-body h4{color:var(--text);font-size:12px;margin:0 0 4px 0;}
@@ -248,7 +262,7 @@ footer{
 .tabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 16px 0;}
 .tab{
   background:var(--panel);border:1px solid var(--border);color:var(--dim);
-  padding:10px 16px;border-radius:10px;font:inherit;font-size:14px;font-weight:600;
+  padding:10px 16px;border-radius:var(--r-input);font:inherit;font-size:14px;font-weight:600;
   cursor:pointer;display:flex;flex-direction:column;align-items:flex-start;line-height:1.25;text-align:left;
 }
 .tab .by{font-size:11px;font-weight:400;color:var(--dim);margin-top:1px;}
@@ -267,15 +281,15 @@ footer{
 .minerhead,.minerrow{display:grid;grid-template-columns:1fr 1fr 80px;gap:8px;align-items:center;}
 .minerhead{font-size:12px;color:var(--dim);margin:8px 0 4px;}
 .minerrow{margin-bottom:6px;}
-.minerrow input{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:7px 9px;border-radius:6px;font-family:var(--mono);font-size:13px;}
+.minerrow input{width:100%;background:var(--panel2);border:1px solid var(--border);color:var(--text);padding:7px 9px;border-radius:var(--r-input);font-family:var(--mono);font-size:13px;}
 .minerrow input:focus{outline:none;border-color:var(--violet-line);}
-.minerbtn,.minerrow button{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font:inherit;font-size:13px;cursor:pointer;}
+.minerbtn,.minerrow button{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:var(--r-input);padding:6px 10px;font:inherit;font-size:13px;cursor:pointer;}
 .minerbtn:hover,.minerrow button:hover{border-color:var(--violet-line);}
 .minerbtn:disabled{opacity:.5;cursor:default;}
 #minerStatus{margin-top:8px;}
 .market-title{font-size:11px;text-transform:uppercase;letter-spacing:.04em;color:var(--dim);margin-bottom:8px;}
 .strategy-link{margin:0 0 12px;}
-.strategy-link a{display:inline-block;padding:7px 14px;font-size:13px;color:#fff;background:var(--violet-line);border:1px solid var(--violet-line);border-radius:8px;text-decoration:none;}
+.strategy-link a{display:inline-block;padding:7px 14px;font-size:13px;color:#fff;background:var(--violet-line);border:1px solid var(--violet-line);border-radius:var(--r-input);text-decoration:none;}
 .strategy-link a:hover,.strategy-link a:focus-visible{background:var(--violet);border-color:var(--violet);color:#fff;outline:none;}
 .coming p{margin:0 0 10px 0;font-size:13px;color:var(--dim);max-width:760px;}
 .coming a, footer a{color:var(--violet-text);text-decoration:none;}
@@ -331,25 +345,23 @@ footer{
 .headline.bad{border-color:var(--red);}
 .headline.ok .htxt h3{color:var(--green);}
 .headline.bad .htxt h3{color:var(--red);}
-.gap-bar-fill{background:var(--red);}
-.gap-bar-fill.over{background:var(--green);}
 .tag.short{background:rgba(209,79,67,0.15);color:var(--red);}
 
 /* Saved setups bar */
-.profilebar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 14px 0;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:10px;font-size:13px;}
+.profilebar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 14px 0;padding:10px 12px;background:var(--panel);border:1px solid var(--border);border-radius:var(--r-input);font-size:13px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);}
 .profilebar label{color:var(--dim);font-size:12px;}
-.profilebar select{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font:inherit;font-size:13px;max-width:200px;}
-.profilebar button,.sharedbanner button{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font:inherit;font-size:13px;cursor:pointer;}
+.profilebar select{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:var(--r-input);padding:6px 8px;font:inherit;font-size:13px;max-width:200px;}
+.profilebar button,.sharedbanner button{background:var(--panel2);color:var(--text);border:1px solid var(--border);border-radius:var(--r-input);padding:6px 10px;font:inherit;font-size:13px;cursor:pointer;}
 .profilebar button:hover,.sharedbanner button:hover{border-color:var(--violet-line);}
 .profilebar .pfsep{flex:1 1 auto;}
 .profilebar .subtle{margin:0;}
-.sharedbanner{margin:0 0 14px 0;padding:10px 12px;border:1px solid var(--violet-line);border-radius:10px;background:var(--panel2);font-size:13px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;}
+.sharedbanner{margin:0 0 14px 0;padding:10px 12px;border:1px solid var(--violet-line);border-radius:var(--r-input);background:var(--panel2);font-size:13px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;}
 .sharedbanner span{flex:1 1 260px;}
 .sharedbanner[hidden]{display:none;}
-.pricewarn{margin:0 0 14px 0;padding:10px 12px;border:1px solid var(--amber);border-radius:10px;background:var(--panel2);color:var(--amber);font-size:13px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;}
+.pricewarn{margin:0 0 14px 0;padding:10px 12px;border:1px solid var(--amber);border-radius:var(--r-input);background:var(--panel2);color:var(--amber);font-size:13px;display:flex;flex-wrap:wrap;align-items:center;gap:8px;}
 .pricewarn[hidden]{display:none;}
 .pricewarn span{flex:1 1 260px;}
-.pricewarn button{background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:6px;padding:6px 10px;font:inherit;font-size:13px;cursor:pointer;}
+.pricewarn button{background:var(--panel);color:var(--text);border:1px solid var(--border);border-radius:var(--r-input);padding:6px 10px;font:inherit;font-size:13px;cursor:pointer;}
 .pricewarn button:hover{border-color:var(--amber);}
 .field input.stale{border-color:var(--amber);}
 </style>
@@ -804,12 +816,21 @@ one more TH   = cost per TH ÷ (mining profit per day ÷ TH × 365)</code>
       </div>
     </div>
 
-    <div class="gap-bar-wrap">
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--dim);margin-bottom:4px;">
-        <span>Total days: now vs. target</span>
-        <span id="tradGapLabel">—</span>
+    <div class="donut-pair">
+      <div class="donut">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="donut-track" cx="60" cy="60" r="50"></circle>
+          <circle class="donut-ring" id="tradLockedRing" cx="60" cy="60" r="50" transform="rotate(-90 60 60)"></circle>
+        </svg>
+        <div class="donut-txt"><span class="donut-cap">Locked</span><b id="tradLockedPct">—</b><span class="donut-sub" id="tradLockedSubtxt">— / — days</span></div>
       </div>
-      <div class="gap-bar"><div class="gap-bar-fill" id="tradGapBar" style="width:0%;"></div></div>
+      <div class="donut">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="donut-track" cx="60" cy="60" r="50"></circle>
+          <circle class="donut-ring" id="tradUnlockedRing" cx="60" cy="60" r="50" transform="rotate(-90 60 60)"></circle>
+        </svg>
+        <div class="donut-txt"><span class="donut-cap">Unlocked</span><b id="tradUnlockedPct">—</b><span class="donut-sub" id="tradUnlockedSubtxt">— / — days</span></div>
+      </div>
     </div>
 
     <div class="table-wrap"><table class="compare-table fit cols5">
@@ -881,12 +902,21 @@ price cushion = 1 − 360 ÷ total days      (how far GMT can fall before total 
       </div>
     </div>
 
-    <div class="gap-bar-wrap">
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--dim);margin-bottom:4px;">
-        <span>Total days: now vs. target</span>
-        <span id="modGapLabel">—</span>
+    <div class="donut-pair">
+      <div class="donut">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="donut-track" cx="60" cy="60" r="50"></circle>
+          <circle class="donut-ring" id="modLockedRing" cx="60" cy="60" r="50" transform="rotate(-90 60 60)"></circle>
+        </svg>
+        <div class="donut-txt"><span class="donut-cap">Locked</span><b id="modLockedPct">—</b><span class="donut-sub" id="modLockedSubtxt">— / — days</span></div>
       </div>
-      <div class="gap-bar"><div class="gap-bar-fill" id="modGapBar" style="width:0%;"></div></div>
+      <div class="donut">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="donut-track" cx="60" cy="60" r="50"></circle>
+          <circle class="donut-ring" id="modUnlockedRing" cx="60" cy="60" r="50" transform="rotate(-90 60 60)"></circle>
+        </svg>
+        <div class="donut-txt"><span class="donut-cap">Unlocked</span><b id="modUnlockedPct">—</b><span class="donut-sub" id="modUnlockedSubtxt">— / — days</span></div>
+      </div>
     </div>
 
     <div class="table-wrap"><table class="compare-table fit cols5">
@@ -992,12 +1022,14 @@ TH growth after n years = (1 + weekly growth)^(52 n) − 1</code>
       </div>
     </div>
 
-    <div class="gap-bar-wrap">
-      <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--dim);margin-bottom:4px;">
-        <span>Locked GMT: now vs. required (locking all your liquid GMT)</span>
-        <span id="gapLabel">—</span>
+    <div class="donut-pair">
+      <div class="donut">
+        <svg viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="donut-track" cx="60" cy="60" r="50"></circle>
+          <circle class="donut-ring" id="opexRing" cx="60" cy="60" r="50" transform="rotate(-90 60 60)"></circle>
+        </svg>
+        <div class="donut-txt"><span class="donut-cap">Locked GMT</span><b id="opexPct">—</b><span class="donut-sub" id="opexSubtxt">— / — GMT</span></div>
       </div>
-      <div class="gap-bar"><div class="gap-bar-fill" id="gapBar" style="width:0%;"></div></div>
     </div>
 
     <div class="table-wrap"><table class="compare-table fit stack cols6">
@@ -1402,6 +1434,28 @@ function tdc(text, ok, label){
   return '<td'+(ok === true ? ' class="ok"' : (ok === false ? ' class="bad"' : ''))+(label ? ' data-label="'+label+'"' : '')+'>'+text+'</td>';
 }
 
+// ---- Donut gauges (locked/unlocked days on Traditional & Modified; locked GMT on OPEX) ----
+const DONUT_C = 2*Math.PI*50; // circle r=50
+function paintDonut(ringId, pctId, subId, value, target, unit){
+  const ring = document.getElementById(ringId);
+  const pct = target > 0 ? Math.min(1, Math.max(0, value/target)) : (value > 0 ? 1 : 0);
+  ring.style.strokeDasharray = DONUT_C.toFixed(1);
+  ring.style.strokeDashoffset = (DONUT_C*(1-pct)).toFixed(1);
+  setState(ring, target > 0 ? value >= target : null);
+  document.getElementById(pctId).textContent = target > 0 ? fmt(pct*100,0)+'%' : '—';
+  document.getElementById(subId).textContent = target > 0
+    ? fmt(value,0)+' / '+fmt(target,0)+' '+unit+(value >= target ? ' · met' : '')
+    : '—';
+}
+function resetDonut(ringId, pctId, subId){
+  const ring = document.getElementById(ringId);
+  ring.style.strokeDasharray = DONUT_C.toFixed(1);
+  ring.style.strokeDashoffset = DONUT_C.toFixed(1);
+  setState(ring, null);
+  document.getElementById(pctId).textContent = '—';
+  document.getElementById(subId).textContent = '—';
+}
+
 // Targets vs what you hold, as table rows (used by the Traditional and Modified tabs).
 function fillBuildRows(tbodyId, lockedTarget, unlockedTarget, S){
   const {dm, gmtPrice, lockedGMT, liquidGMT, totalGmt} = S;
@@ -1561,13 +1615,9 @@ function renderModified(S){
   setState($('modUnlockedStat'), dm > 0 ? unlockedDays >= M.unlockedTarget : null);
   setState($('modAcquire'), dm > 0 ? plan.acquireDays <= 0.5 : null);
 
-  // ---- progress bar: total days vs target ----
-  const bar = $('modGapBar');
-  bar.style.width = (plan.totalTarget > 0 ? Math.min(100, plan.total/plan.totalTarget*100) : 100)+'%';
-  bar.classList.toggle('over', plan.total >= plan.totalTarget);
-  $('modGapLabel').textContent = plan.total >= plan.totalTarget
-    ? fmt(plan.total,0)+' / '+fmt(plan.totalTarget,0)+' days (target met)'
-    : fmt(plan.total,0)+' / '+fmt(plan.totalTarget,0)+' days ('+fmt(plan.totalTarget-plan.total,0)+' short)';
+  // ---- progress donuts: locked / unlocked days vs their targets ----
+  paintDonut('modLockedRing', 'modLockedPct', 'modLockedSubtxt', lockedDays, M.lockedTarget, 'days');
+  paintDonut('modUnlockedRing', 'modUnlockedPct', 'modUnlockedSubtxt', unlockedDays, M.unlockedTarget, 'days');
 
   // ---- tables ----
   fillBuildRows('modBuildRows', M.lockedTarget, M.unlockedTarget, S);
@@ -1712,13 +1762,9 @@ function renderTraditional(S){
   setState($('tradAcquire'), dm > 0 ? plan.acquireDays <= 0.5 : null);
   setState($('tradCushion'), dm > 0 && plan.total > 0 ? plan.cushion > 0 : null);
 
-  // ---- progress bar: total days vs target ----
-  const bar = $('tradGapBar');
-  bar.style.width = (plan.totalTarget > 0 ? Math.min(100, plan.total/plan.totalTarget*100) : 100)+'%';
-  bar.classList.toggle('over', plan.total >= plan.totalTarget);
-  $('tradGapLabel').textContent = plan.total >= plan.totalTarget
-    ? fmt(plan.total,0)+' / '+fmt(plan.totalTarget,0)+' days (target met)'
-    : fmt(plan.total,0)+' / '+fmt(plan.totalTarget,0)+' days ('+fmt(plan.totalTarget-plan.total,0)+' short)';
+  // ---- progress donuts: locked / unlocked days vs their targets ----
+  paintDonut('tradLockedRing', 'tradLockedPct', 'tradLockedSubtxt', lockedDays, T.lockedTarget, 'days');
+  paintDonut('tradUnlockedRing', 'tradUnlockedPct', 'tradUnlockedSubtxt', unlockedDays, T.unlockedTarget, 'days');
 
   // ---- build table: targets vs what you hold ----
   fillBuildRows('tradBuildRows', T.lockedTarget, T.unlockedTarget, S);
@@ -2090,7 +2136,6 @@ function renderOpex(S){
 
   const head = document.getElementById('reqLockedHead');
   const sub = document.getElementById('reqLockedSub');
-  const barEl = document.getElementById('gapBar');
   if(!planAll){
     head.textContent = "—";
     setHead("opexHeadline", "opexHval", false);
@@ -2098,8 +2143,7 @@ function renderOpex(S){
     sub.textContent = "Not reachable: at this coverage target your costs exceed the whole weekly reward pool.";
     document.getElementById('buyGmt').textContent = "—";
     document.getElementById('buyUsd').textContent = "";
-    document.getElementById('gapLabel').textContent = "—";
-    barEl.style.width = "0%";
+    resetDonut('opexRing', 'opexPct', 'opexSubtxt');
   }else{
     const L = planAll.L;
     const gap = Math.max(0, L - lockedGMT);
@@ -2113,11 +2157,7 @@ function renderOpex(S){
       : "Your current lock already meets the target at the "+periodName+" lock period.";
     document.getElementById('buyGmt').textContent = buy>0 ? fmt(buy,0)+" GMT" : "0";
     document.getElementById('buyUsd').textContent = buy>0 ? "≈ "+usd(buy*gmtPrice)+" at current price" : "nothing to buy";
-    barEl.style.width = (L>0 ? Math.min(100, lockedGMT/L*100) : 100)+"%";
-    barEl.classList.toggle('over', lockedGMT>=L);
-    document.getElementById('gapLabel').textContent = gap>0
-      ? fmt(lockedGMT,0)+" / "+fmt(L,0)+" GMT ("+fmt(gap,0)+" short)"
-      : fmt(lockedGMT,0)+" / "+fmt(L,0)+" GMT (target met)";
+    paintDonut('opexRing', 'opexPct', 'opexSubtxt', lockedGMT, L, 'GMT');
   }
 
   // by lock period (locking all your liquid GMT)
