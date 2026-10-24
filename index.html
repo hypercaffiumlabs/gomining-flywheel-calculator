@@ -303,7 +303,21 @@ footer{
 .ck.info{background:var(--violet-line);}
 
 #posPanel{grid-column:1/-1;}
-#rewardsPanel, #roiPanel{grid-column:1/-1;}
+#rewardsPanel{grid-column:1/-1;}
+
+/* Merged sub-sections: Targets inside My Farm, ROI inside Results */
+.farm-sep{border:none;border-top:1px solid var(--border);opacity:.6;margin:18px 0 14px 0;}
+.subhead{font-size:12px;text-transform:uppercase;letter-spacing:1px;color:var(--violet-text);margin:0 0 14px 0;}
+.farm-targets[hidden]{display:none;}
+
+/* Shared column widths so tables stacked in the same merged card (and the same
+   table shape in another tab) line up edge to edge instead of auto-sizing per table. */
+.compare-table.cols5 col:first-child{width:32%;}
+.compare-table.cols5 col:not(:first-child){width:17%;}
+.compare-table.cols4 col:first-child{width:34%;}
+.compare-table.cols4 col:not(:first-child){width:22%;}
+.compare-table.cols6 col:first-child{width:24%;}
+.compare-table.cols6 col:not(:first-child){width:15.2%;}
 .stat-grid.three{grid-template-columns:repeat(3,1fr);}
 @media(max-width:600px){.stat-grid.three{grid-template-columns:1fr;}}
 .posgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
@@ -537,6 +551,105 @@ footer{
         </div>
       </div>
     </details>
+
+    <hr class="farm-sep">
+
+    <!-- TARGETS (one block per tab; shown/hidden to match the active tab) -->
+    <div class="farm-targets" id="farmTargets-traditional">
+      <h3 class="subhead">The Flywheel's Targets</h3>
+      <div class="row2">
+        <div class="field">
+          <label>Locked Days <b id="tradLockedGmt">—</b></label>
+          <input type="number" id="tradLocked" value="360" step="1" min="0" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Unlocked Days <b id="tradUnlockedGmt">—</b></label>
+          <input type="number" id="tradUnlocked" value="140" step="1" min="0" oninput="calc()">
+        </div>
+      </div>
+      <div class="field">
+        <label>Unlocked While Building <b id="tradKeepGmt">—</b></label>
+        <input type="number" id="tradKeep" value="14" step="1" min="0" oninput="calc()">
+        <div class="subtle">Until the locked side reaches its target, keep only about this many days unlocked (DracoF: 14) and lock the rest for the maximum period.</div>
+      </div>
+      <div class="kv"><span>Total target</span><b id="tradTotalTarget">—</b></div>
+      <div class="kv"><span>Optional: buy miners</span><b id="tradBuyTrigger">—</b></div>
+      <div class="kv"><span>Optional: sell extra miners</span><b id="tradSellTrigger">—</b></div>
+      <div class="subtle">Defaults are DracoF's 360 locked / 140 unlocked = 500 days. "Days" are GoMining's maintenance days for your farm, as on the Maintenance Discount page.</div>
+    </div>
+
+    <div class="farm-targets" id="farmTargets-modified" hidden>
+      <h3 class="subhead">Targets &amp; Market</h3>
+      <div class="row2">
+        <div class="field">
+          <label>Locked Days <b id="modLockedGmt">—</b></label>
+          <input type="number" id="modLocked" value="400" step="1" min="0" oninput="calc()">
+        </div>
+        <div class="field">
+          <label>Unlocked Days <b id="modUnlockedGmt">—</b></label>
+          <input type="number" id="modUnlocked" value="100" step="1" min="0" oninput="calc()">
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>Unlocked Floor <b id="modMinGmt">—</b></label>
+          <input type="number" id="modMin" value="50" step="1" min="0" oninput="calc()">
+          <div class="subtle">The lowest buffer worth running when a deal justifies it (Audacity: 50).</div>
+        </div>
+        <div class="field">
+          <label>Marketplace Discount <b>%</b></label>
+          <input type="number" id="mktDiscount" value="20" step="1" min="0" max="95" oninput="calc()">
+          <div class="subtle">How far below GoMining's ask listed TH usually sells (Audacity: 20%+).</div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>BTC Price <b>$</b></label>
+          <input type="number" id="btcPrice" value="84000" step="100" min="0" oninput="onBtcInput()">
+          <div class="subtle" id="btcStatus">Fetching live price…</div>
+        </div>
+        <div class="field">
+          <label>BTC Cutoff <b>$</b></label>
+          <input type="number" id="btcCutoff" value="100000" step="1000" min="0" oninput="calc()">
+          <div class="subtle">Above this, stop buying TH and start taking profits. Audacity's own line is $100k; set yours.</div>
+        </div>
+      </div>
+      <div class="row2">
+        <div class="field">
+          <label>TH Ask Price <b>$/TH</b></label>
+          <input type="number" id="thPrice" value="12.53" step="0.01" min="0" oninput="onThPriceInput()">
+          <div class="subtle" id="thPriceNote"></div>
+          <div class="subtle">GoMining's price for new TH at your efficiency. Estimated from Audacity's July 2026 numbers ($12.53 at 15 W/TH plus $2.67 per W/TH of upgrade, about $20.54 at 12 W/TH). Type GoMining's current price to replace it.</div>
+        </div>
+        <div class="field">
+          <label>Greedy Machine Growth <b>%/week</b></label>
+          <input type="number" id="greedyGrowth" value="0.16" step="0.01" min="0" oninput="calc()">
+          <div class="subtle">Free weekly TH growth (DracoF: about 0.16%, or 8.7% a year).</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="farm-targets" id="farmTargets-opex" hidden>
+      <h3 class="subhead">Target &amp; Lock</h3>
+      <div class="field">
+        <label>OPEX Coverage Target <b id="targetOut">125%</b></label>
+        <input type="range" id="target" min="50" max="200" step="5" value="125" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Lock Period <b id="periodOut">Max</b></label>
+        <select id="period" onchange="calc()">
+          <option value="0.004791">1 week</option>
+          <option value="0.020534">1 month</option>
+          <option value="0.062286">3 months</option>
+          <option value="0.124572">6 months</option>
+          <option value="0.249829">1 year</option>
+          <option value="0.499658">2 years</option>
+          <option value="0.749487">3 years</option>
+          <option value="1.000000" selected>Max (4 years)</option>
+        </select>
+        <div class="subtle">Votes = GMT locked × time left ÷ 4 years. A lock's votes decay weekly unless you re-extend it, and this model assumes you keep it at this period.</div>
+      </div>
+    </div>
   </div>
 
   <!-- WEEKLY REWARDS & SAVINGS -->
@@ -577,9 +690,10 @@ lock rewards = POOL × v ÷ (T_others + v),  v = locked GMT × lock-period facto
     </details>
   </div>
 
-  <!-- RETURN ON INVESTMENT -->
-  <div class="panel" id="roiPanel">
-    <h2>Return on Investment</h2>
+  <!-- RETURN ON INVESTMENT (relocated by JS into whichever tab's Results card is active) -->
+  <div id="roiPanel">
+    <hr class="farm-sep">
+    <h3 class="subhead">Return on Investment</h3>
     <div class="row2 align-labels">
       <div class="field">
         <label>Paid for miners <b>USD</b></label>
@@ -624,12 +738,14 @@ lock rewards = POOL × v ÷ (T_others + v),  v = locked GMT × lock-period facto
       </div>
     </div>
 
-    <div class="table-wrap"><table class="compare-table">
+    <div class="table-wrap"><table class="compare-table cols5">
+      <colgroup><col><col><col><col><col></colgroup>
       <tr><th>If BTC moves</th><th>BTC price</th><th>Yearly profit</th><th>ROI / year</th><th>Payback</th></tr>
       <tbody id="roiBtcRows"></tbody>
     </table></div>
 
-    <div class="table-wrap"><table class="compare-table">
+    <div class="table-wrap"><table class="compare-table cols5">
+      <colgroup><col><col><col><col><col></colgroup>
       <tr><th>Buying one more TH</th><th>Cost per TH</th><th>Profit per TH / year</th><th>ROI / year</th><th>Payback</th></tr>
       <tbody id="roiThRows"></tbody>
     </table></div>
@@ -653,33 +769,8 @@ one more TH   = cost per TH ÷ (mining profit per day ÷ TH × 365)</code>
 <section class="tab-panel" role="tabpanel" id="panel-traditional" aria-labelledby="tab-traditional">
 <div class="grid">
 
-  <!-- TARGETS -->
-  <div class="panel" style="grid-column:1/-1;">
-    <h2>The Flywheel's Targets</h2>
-    <div class="row2">
-      <div class="field">
-        <label>Locked Days <b id="tradLockedGmt">—</b></label>
-        <input type="number" id="tradLocked" value="360" step="1" min="0" oninput="calc()">
-      </div>
-      <div class="field">
-        <label>Unlocked Days <b id="tradUnlockedGmt">—</b></label>
-        <input type="number" id="tradUnlocked" value="140" step="1" min="0" oninput="calc()">
-      </div>
-    </div>
-    <div class="field">
-      <label>Unlocked While Building <b id="tradKeepGmt">—</b></label>
-      <input type="number" id="tradKeep" value="14" step="1" min="0" oninput="calc()">
-      <div class="subtle">Until the locked side reaches its target, keep only about this many days unlocked (DracoF: 14) and lock the rest for the maximum period.</div>
-    </div>
-    <div class="kv"><span>Total target</span><b id="tradTotalTarget">—</b></div>
-    <div class="kv"><span>Optional: buy miners</span><b id="tradBuyTrigger">—</b></div>
-    <div class="kv"><span>Optional: sell extra miners</span><b id="tradSellTrigger">—</b></div>
-    <div class="subtle">Defaults are DracoF's 360 locked / 140 unlocked = 500 days. "Days" are GoMining's maintenance days for your farm, as on the Maintenance Discount page.</div>
-  </div>
-
-
-  <!-- RESULTS -->
-  <div class="panel results">
+  <!-- RESULTS (+ ROI, merged in by JS) -->
+  <div class="panel results" id="results-traditional">
     <h2>Results</h2>
 
     <div class="headline" id="tradHeadline">
@@ -721,7 +812,8 @@ one more TH   = cost per TH ÷ (mining profit per day ÷ TH × 365)</code>
       <div class="gap-bar"><div class="gap-bar-fill" id="tradGapBar" style="width:0%;"></div></div>
     </div>
 
-    <div class="table-wrap"><table class="compare-table fit">
+    <div class="table-wrap"><table class="compare-table fit cols5">
+      <colgroup><col><col><col><col><col></colgroup>
       <tr><th>Target</th><th>Days</th><th>GMT · USD at today's price</th><th>You hold</th><th>Gap</th></tr>
       <tbody id="tradBuildRows"></tbody>
     </table></div>
@@ -754,61 +846,8 @@ price cushion = 1 − 360 ÷ total days      (how far GMT can fall before total 
 <section class="tab-panel" role="tabpanel" id="panel-modified" aria-labelledby="tab-modified" hidden>
 <div class="grid">
 
-  <!-- TARGETS & MARKET -->
-  <div class="panel" style="grid-column:1/-1;">
-    <h2>Targets &amp; Market</h2>
-    <div class="row2">
-      <div class="field">
-        <label>Locked Days <b id="modLockedGmt">—</b></label>
-        <input type="number" id="modLocked" value="400" step="1" min="0" oninput="calc()">
-      </div>
-      <div class="field">
-        <label>Unlocked Days <b id="modUnlockedGmt">—</b></label>
-        <input type="number" id="modUnlocked" value="100" step="1" min="0" oninput="calc()">
-      </div>
-    </div>
-    <div class="row2">
-      <div class="field">
-        <label>Unlocked Floor <b id="modMinGmt">—</b></label>
-        <input type="number" id="modMin" value="50" step="1" min="0" oninput="calc()">
-        <div class="subtle">The lowest buffer worth running when a deal justifies it (Audacity: 50).</div>
-      </div>
-      <div class="field">
-        <label>Marketplace Discount <b>%</b></label>
-        <input type="number" id="mktDiscount" value="20" step="1" min="0" max="95" oninput="calc()">
-        <div class="subtle">How far below GoMining's ask listed TH usually sells (Audacity: 20%+).</div>
-      </div>
-    </div>
-    <div class="row2">
-      <div class="field">
-        <label>BTC Price <b>$</b></label>
-        <input type="number" id="btcPrice" value="84000" step="100" min="0" oninput="onBtcInput()">
-        <div class="subtle" id="btcStatus">Fetching live price…</div>
-      </div>
-      <div class="field">
-        <label>BTC Cutoff <b>$</b></label>
-        <input type="number" id="btcCutoff" value="100000" step="1000" min="0" oninput="calc()">
-        <div class="subtle">Above this, stop buying TH and start taking profits. Audacity's own line is $100k; set yours.</div>
-      </div>
-    </div>
-    <div class="row2">
-      <div class="field">
-        <label>TH Ask Price <b>$/TH</b></label>
-        <input type="number" id="thPrice" value="12.53" step="0.01" min="0" oninput="onThPriceInput()">
-        <div class="subtle" id="thPriceNote"></div>
-        <div class="subtle">GoMining's price for new TH at your efficiency. Estimated from Audacity's July 2026 numbers ($12.53 at 15 W/TH plus $2.67 per W/TH of upgrade, about $20.54 at 12 W/TH). Type GoMining's current price to replace it.</div>
-      </div>
-      <div class="field">
-        <label>Greedy Machine Growth <b>%/week</b></label>
-        <input type="number" id="greedyGrowth" value="0.16" step="0.01" min="0" oninput="calc()">
-        <div class="subtle">Free weekly TH growth (DracoF: about 0.16%, or 8.7% a year).</div>
-      </div>
-    </div>
-  </div>
-
-
-  <!-- RESULTS -->
-  <div class="panel results">
+  <!-- RESULTS (+ ROI, merged in by JS) -->
+  <div class="panel results" id="results-modified">
     <h2>Results</h2>
 
     <div class="headline" id="modHeadline">
@@ -850,12 +889,14 @@ price cushion = 1 − 360 ÷ total days      (how far GMT can fall before total 
       <div class="gap-bar"><div class="gap-bar-fill" id="modGapBar" style="width:0%;"></div></div>
     </div>
 
-    <div class="table-wrap"><table class="compare-table fit">
+    <div class="table-wrap"><table class="compare-table fit cols5">
+      <colgroup><col><col><col><col><col></colgroup>
       <tr><th>Target</th><th>Days</th><th>GMT · USD at today's price</th><th>You hold</th><th>Gap</th></tr>
       <tbody id="modBuildRows"></tbody>
     </table></div>
 
-    <div class="table-wrap"><table class="compare-table">
+    <div class="table-wrap"><table class="compare-table cols5">
+      <colgroup><col><col><col><col><col></colgroup>
       <tr><th>Buying TH with your earnings</th><th>Price per TH</th><th>GMT per TH</th><th>TH per $100</th><th>Marketplace advantage</th></tr>
       <tbody id="modThRows"></tbody>
     </table></div>
@@ -896,31 +937,8 @@ TH growth after n years = (1 + weekly growth)^(52 n) − 1</code>
 <section class="tab-panel" role="tabpanel" id="panel-opex" aria-labelledby="tab-opex" hidden>
 <div class="grid">
 
-  <!-- TARGET & LOCK -->
-  <div class="panel">
-    <h2>Target &amp; Lock</h2>
-    <div class="field">
-      <label>OPEX Coverage Target <b id="targetOut">125%</b></label>
-      <input type="range" id="target" min="50" max="200" step="5" value="125" oninput="calc()">
-    </div>
-    <div class="field">
-      <label>Lock Period <b id="periodOut">Max</b></label>
-      <select id="period" onchange="calc()">
-        <option value="0.004791">1 week</option>
-        <option value="0.020534">1 month</option>
-        <option value="0.062286">3 months</option>
-        <option value="0.124572">6 months</option>
-        <option value="0.249829">1 year</option>
-        <option value="0.499658">2 years</option>
-        <option value="0.749487">3 years</option>
-        <option value="1.000000" selected>Max (4 years)</option>
-      </select>
-      <div class="subtle">Votes = GMT locked × time left ÷ 4 years. A lock's votes decay weekly unless you re-extend it, and this model assumes you keep it at this period.</div>
-    </div>
-  </div>
-
   <!-- LOCK REWARDS MODEL -->
-  <div class="panel">
+  <div class="panel" style="grid-column:1/-1;">
     <h2>Lock Rewards</h2>
     <div class="row2">
       <div class="field">
@@ -939,8 +957,8 @@ TH growth after n years = (1 + weekly growth)^(52 n) − 1</code>
     <div class="subtle">Your real APR is lower for a big lock: your own votes dilute the pool.</div>
   </div>
 
-  <!-- RESULTS -->
-  <div class="panel results">
+  <!-- RESULTS (+ ROI, merged in by JS) -->
+  <div class="panel results" id="results-opex">
     <h2>Results</h2>
 
     <div class="headline" id="opexHeadline">
@@ -982,12 +1000,14 @@ TH growth after n years = (1 + weekly growth)^(52 n) − 1</code>
       <div class="gap-bar"><div class="gap-bar-fill" id="gapBar" style="width:0%;"></div></div>
     </div>
 
-    <div class="table-wrap"><table class="compare-table fit stack">
+    <div class="table-wrap"><table class="compare-table fit stack cols6">
+      <colgroup><col><col><col><col><col><col></colgroup>
       <tr><th>Plan</th><th>Required Locked GMT</th><th>Token Discount</th><th>Lock APR</th><th>From Your Liquid</th><th>GMT to Buy</th></tr>
       <tbody id="planRows"></tbody>
     </table></div>
 
-    <div class="table-wrap"><table class="compare-table fit">
+    <div class="table-wrap"><table class="compare-table fit cols4">
+      <colgroup><col><col><col><col></colgroup>
       <tr><th>Lock Period (lock all)</th><th>Required Locked GMT</th><th>Lock APR</th><th>GMT to Buy</th></tr>
       <tbody id="periodRows"></tbody>
     </table></div>
@@ -2154,7 +2174,12 @@ function selectTab(name, fromHash){
     tab.setAttribute('aria-selected', on ? 'true' : 'false');
     tab.tabIndex = on ? 0 : -1;
     document.getElementById('panel-'+t).hidden = !on;
+    document.getElementById('farmTargets-'+t).hidden = !on;
   });
+  // The ROI card is one shared calculator (it doesn't change by strategy), so instead of
+  // duplicating it per tab, move its single DOM node into whichever tab's Results card is
+  // showing right now, where it appears merged in beneath that tab's own Results content.
+  document.getElementById('results-'+name).appendChild(document.getElementById('roiPanel'));
   const link = document.getElementById('strategyLink');
   link.href = STRATEGY_LINKS[name][0];
   link.textContent = STRATEGY_LINKS[name][1];
