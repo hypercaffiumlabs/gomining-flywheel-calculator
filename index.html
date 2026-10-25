@@ -639,17 +639,10 @@ footer{
           <input type="number" id="modUnlocked" value="100" step="1" min="0" oninput="calc()">
         </div>
       </div>
-      <div class="row2">
-        <div class="field">
-          <label>Unlocked Floor <b id="modMinGmt">—</b></label>
-          <input type="number" id="modMin" value="50" step="1" min="0" oninput="calc()">
-          <div class="subtle">The lowest buffer worth running when a deal justifies it (Audacity: 50).</div>
-        </div>
-        <div class="field">
-          <label>Marketplace Discount <b>%</b></label>
-          <input type="number" id="mktDiscount" value="20" step="1" min="0" max="95" oninput="calc()">
-          <div class="subtle">How far below GoMining's ask listed TH usually sells (Audacity: 20%+).</div>
-        </div>
+      <div class="field">
+        <label>Unlocked Floor <b id="modMinGmt">—</b></label>
+        <input type="number" id="modMin" value="50" step="1" min="0" oninput="calc()">
+        <div class="subtle">The lowest buffer worth running when a deal justifies it (Audacity: 50).</div>
       </div>
       <div class="row2">
         <div class="field">
@@ -663,19 +656,30 @@ footer{
           <div class="subtle">Above this, stop buying TH and start taking profits. Audacity's own line is $100k; set yours.</div>
         </div>
       </div>
-      <div class="row2">
-        <div class="field">
-          <label>TH Ask Price <b>$/TH</b></label>
-          <input type="number" id="thPrice" value="12.53" step="0.01" min="0" oninput="onThPriceInput()">
-          <div class="subtle" id="thPriceNote"></div>
-          <div class="subtle">GoMining's price for new TH at your efficiency. Estimated from Audacity's July 2026 numbers ($12.53 at 15 W/TH plus $2.67 per W/TH of upgrade, about $20.54 at 12 W/TH). Type GoMining's current price to replace it.</div>
+
+      <details class="miners">
+        <summary>Advanced assumptions · rarely need changing</summary>
+        <div class="miners-body">
+          <div class="row2">
+            <div class="field">
+              <label>Marketplace Discount <b>%</b></label>
+              <input type="number" id="mktDiscount" value="20" step="1" min="0" max="95" oninput="calc()">
+              <div class="subtle">How far below GoMining's ask listed TH usually sells (Audacity: 20%+).</div>
+            </div>
+            <div class="field">
+              <label>Greedy Machine Growth <b>%/week</b></label>
+              <input type="number" id="greedyGrowth" value="0.16" step="0.01" min="0" oninput="calc()">
+              <div class="subtle">Free weekly TH growth (DracoF: about 0.16%, or 8.7% a year).</div>
+            </div>
+          </div>
+          <div class="field">
+            <label>TH Ask Price <b>$/TH</b></label>
+            <input type="number" id="thPrice" value="12.53" step="0.01" min="0" oninput="onThPriceInput()">
+            <div class="subtle" id="thPriceNote"></div>
+            <div class="subtle">GoMining's price for new TH at your efficiency. Estimated from Audacity's July 2026 numbers ($12.53 at 15 W/TH plus $2.67 per W/TH of upgrade, about $20.54 at 12 W/TH). Type GoMining's current price to replace it.</div>
+          </div>
         </div>
-        <div class="field">
-          <label>Greedy Machine Growth <b>%/week</b></label>
-          <input type="number" id="greedyGrowth" value="0.16" step="0.01" min="0" oninput="calc()">
-          <div class="subtle">Free weekly TH growth (DracoF: about 0.16%, or 8.7% a year).</div>
-        </div>
-      </div>
+      </details>
     </div>
 
     <div class="farm-targets" id="farmTargets-opex" hidden>
@@ -876,11 +880,13 @@ one more TH   = cost per TH ÷ (mining profit per day ÷ TH × 365)</code>
   </div>
 
   <!-- WEEKLY CHECKLIST -->
-  <div class="panel" style="grid-column:1/-1;">
-    <h2>Weekly Checklist</h2>
-    <ul class="checklist" id="tradChecklist"></ul>
-    <div class="subtle">DracoF's advice: decide no more than once a week, on the day your lock dividends arrive (usually Tuesday).</div>
-  </div>
+  <details class="formula" style="grid-column:1/-1;">
+    <summary>Weekly Checklist</summary>
+    <div style="margin-top:14px;">
+      <ul class="checklist" id="tradChecklist"></ul>
+      <div class="subtle">DracoF's advice: decide no more than once a week, on the day your lock dividends arrive (usually Tuesday).</div>
+    </div>
+  </details>
 
   <details class="formula">
     <summary>Formula reference</summary>
@@ -973,11 +979,13 @@ price cushion = 1 − 360 ÷ total days      (how far GMT can fall before total 
   </div>
 
   <!-- AUDACITY'S PLAN -->
-  <div class="panel" style="grid-column:1/-1;">
-    <h2>Audacity's Plan</h2>
-    <ul class="checklist" id="modChecklist"></ul>
-    <div class="subtle">Buy into weakness, sell into strength. Not financial advice: the cutoff and the discounts are assumptions you set.</div>
-  </div>
+  <details class="formula" style="grid-column:1/-1;">
+    <summary>Audacity's Plan</summary>
+    <div style="margin-top:14px;">
+      <ul class="checklist" id="modChecklist"></ul>
+      <div class="subtle">Buy into weakness, sell into strength. Not financial advice: the cutoff and the discounts are assumptions you set.</div>
+    </div>
+  </details>
 
   <details class="formula">
     <summary>Formula reference</summary>
@@ -1072,11 +1080,16 @@ TH growth after n years = (1 + weekly growth)^(52 n) − 1</code>
       <tbody id="planRows"></tbody>
     </table></div>
 
-    <div class="table-wrap"><table class="compare-table fit cols4">
-      <colgroup><col><col><col><col></colgroup>
-      <tr><th>Lock Period (lock all)</th><th>Required Locked GMT</th><th>Lock APR</th><th>GMT to Buy</th></tr>
-      <tbody id="periodRows"></tbody>
-    </table></div>
+    <details class="formula" style="padding:0;border:none;background:none;margin-top:10px;">
+      <summary>See by lock period</summary>
+      <div class="formula-body" style="margin-top:6px;">
+        <div class="table-wrap"><table class="compare-table fit cols4">
+          <colgroup><col><col><col><col></colgroup>
+          <tr><th>Lock Period (lock all)</th><th>Required Locked GMT</th><th>Lock APR</th><th>GMT to Buy</th></tr>
+          <tbody id="periodRows"></tbody>
+        </table></div>
+      </div>
+    </details>
   </div>
 
   <details class="formula">
@@ -1497,11 +1510,14 @@ function fillBuildRows(tbodyId, lockedTarget, unlockedTarget, S){
   const totalTarget = lockedTarget + unlockedTarget;
   const row = (label, tgtDays, held) => {
     const tgtGmt = tgtDays*dm;
-    const gap = Math.max(0, tgtGmt - held);
-    const verdict = dm > 0 ? held >= tgtGmt - 0.5 : null;
+    const diff = held - tgtGmt;   // positive = surplus GMT, negative = shortfall
+    const verdict = dm > 0 ? diff >= -0.5 : null;
+    let gapTxt = '—';
+    if(dm > 0 && diff > 0.5) gapTxt = '+'+fmt(diff,0)+' GMT';
+    else if(dm > 0 && diff < -0.5) gapTxt = fmt(-diff,0)+' GMT';
     return '<tr><td style="font-family:var(--sans);">'+label+'</td><td>'+fmt(tgtDays,0)+'</td><td>'+fmt(tgtGmt,0)+' GMT · '+usd(tgtGmt*gmtPrice)+'</td>'
       + tdc(fmt(held,0)+' GMT', verdict)
-      + tdc(gap > 0.5 ? fmt(gap,0)+' GMT' : '—', dm > 0 ? gap <= 0.5 : null)+'</tr>';
+      + tdc(gapTxt, verdict)+'</tr>';
   };
   document.getElementById(tbodyId).innerHTML =
       row('Locked (max period)', lockedTarget, lockedGMT)
