@@ -1514,8 +1514,8 @@ function fillBuildRows(tbodyId, lockedTarget, unlockedTarget, S){
     const diff = held - tgtGmt;   // positive = surplus GMT, negative = shortfall
     const verdict = dm > 0 ? diff >= -0.5 : null;
     let gapTxt = '—';
-    if(dm > 0 && diff > 0.5) gapTxt = '+'+fmt(diff,0)+' GMT';
-    else if(dm > 0 && diff < -0.5) gapTxt = fmt(-diff,0)+' GMT';
+    if(dm > 0 && diff > 0.5) gapTxt = '+'+fmt(diff,0);
+    else if(dm > 0 && diff < -0.5) gapTxt = '−'+fmt(-diff,0);
     return '<tr><td style="font-family:var(--sans);">'+label+'</td><td>'+fmt(tgtDays,0)+'</td><td>'+fmt(tgtGmt,0)+' GMT · '+usd(tgtGmt*gmtPrice)+'</td>'
       + tdc(fmt(held,0)+' GMT', verdict)
       + tdc(gapTxt, verdict)+'</tr>';
