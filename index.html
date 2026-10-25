@@ -621,9 +621,9 @@ footer{
         </div>
       </div>
       <div class="field">
-        <label>Unlocked While Building <b id="tradKeepGmt">—</b></label>
+        <label>Build-Phase Buffer <b id="tradKeepGmt">—</b></label>
         <input type="number" id="tradKeep" value="14" step="1" min="0" oninput="calc()">
-        <div class="subtle">Until the locked side reaches its target, keep only about this many days unlocked (DracoF: 14) and lock the rest for the maximum period.</div>
+        <div class="subtle">Only applies until you hit the Locked Days target above. Until then, keep just this many days unlocked (DracoF: 14) and lock everything extra for the maximum period.</div>
       </div>
       <div class="kv"><span>Total target</span><b id="tradTotalTarget">—</b></div>
       <div class="kv"><span>Optional: buy miners</span><b id="tradBuyTrigger">—</b></div>
@@ -2051,6 +2051,10 @@ function renderRoi(S){
   const invested = minerUsd + gmtUsd;
   $('roiMinerNote').textContent = (minerPaid === null ? 'Using' : 'Today\'s value')+' '+usd(minerValue)+' ('+fmt(S.th,2)+' TH × '+usd(S.mod.thPrice)+' ask).';
   $('roiGmtNote').textContent = (gmtPaid === null ? 'Using' : 'Today\'s value')+' '+usd(gmtValue)+' ('+fmt(S.totalGmt,0)+' GMT × $'+fmt(S.gmtPrice,4)+').';
+  // Show the live fallback value right in the box, so leaving it blank is self-explanatory
+  // without having to read the note underneath.
+  $('roiMinerUsd').placeholder = 'blank = '+usd(minerValue);
+  $('roiGmtUsd').placeholder = 'blank = '+usd(gmtValue);
 
   $('roiInvested').textContent = usd(invested);
   $('roiInvestedSub').textContent = usd(minerUsd)+' miners + '+usd(gmtUsd)+' GMT';
