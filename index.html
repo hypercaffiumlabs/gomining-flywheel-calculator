@@ -316,8 +316,6 @@ footer{
 .ck.todo{background:var(--amber);}
 .ck.info{background:var(--violet-line);}
 
-#posPanel{grid-column:1/-1;}
-#rewardsPanel{grid-column:1/-1;}
 
 /* Merged sub-sections: Targets inside My Farm, ROI inside Results */
 .farm-sep{border:none;border-top:1px solid var(--border);opacity:.6;margin:18px 0 14px 0;}
@@ -703,9 +701,9 @@ footer{
     </div>
   </div>
 
-  <!-- WEEKLY REWARDS & SAVINGS -->
-  <div class="panel" id="rewardsPanel">
-    <h2>Where You Stand Today</h2>
+  <!-- PROFIT & RETURN (today's earnings, merged with the ROI framing built on top of them) -->
+  <div class="panel" id="profitPanel" style="grid-column:1/-1;">
+    <h2>Profit &amp; Return</h2>
     <div class="field" style="max-width:220px;">
       <label>Show amounts per</label>
       <select id="rewardPeriod" onchange="calc()">
@@ -731,18 +729,7 @@ footer{
         </table></div>
       </div>
     </details>
-    <details class="formula">
-      <summary>How this is calculated</summary>
-      <div class="formula-body">
-        <code>profit = pool reward × BTC price − maintenance − reinvest fee (2.25% of profit, approximate) + lock rewards
-discount saving = daily maintenance at 0% × discount rate
-lock rewards = POOL × v ÷ (T_others + v),  v = locked GMT × lock-period factor</code>
-      </div>
-    </details>
-  </div>
 
-  <!-- RETURN ON INVESTMENT (relocated by JS into whichever tab's Results card is active) -->
-  <div id="roiPanel">
     <hr class="farm-sep">
     <h3 class="subhead">Return on Investment</h3>
     <div class="row2 align-labels">
@@ -788,25 +775,33 @@ lock rewards = POOL × v ÷ (T_others + v),  v = locked GMT × lock-period facto
         <div class="sub" id="roiBreakevenSub">—</div>
       </div>
     </div>
-
-    <div class="table-wrap"><table class="compare-table cols5">
-      <colgroup><col><col><col><col><col></colgroup>
-      <tr><th>If BTC moves</th><th>BTC price</th><th>Yearly profit</th><th>ROI / year</th><th>Payback</th></tr>
-      <tbody id="roiBtcRows"></tbody>
-    </table></div>
-
-    <div class="table-wrap"><table class="compare-table cols5">
-      <colgroup><col><col><col><col><col></colgroup>
-      <tr><th>Buying one more TH</th><th>Cost per TH</th><th>Profit per TH / year</th><th>ROI / year</th><th>Payback</th></tr>
-      <tbody id="roiThRows"></tbody>
-    </table></div>
     <div class="subtle" id="roiNote">—</div>
+
+    <details class="formula" style="padding:0;border:none;background:none;margin-top:10px;">
+      <summary>See BTC &amp; one-more-TH scenarios</summary>
+      <div class="formula-body" style="margin-top:6px;">
+        <div class="table-wrap"><table class="compare-table cols5">
+          <colgroup><col><col><col><col><col></colgroup>
+          <tr><th>If BTC moves</th><th>BTC price</th><th>Yearly profit</th><th>ROI / year</th><th>Payback</th></tr>
+          <tbody id="roiBtcRows"></tbody>
+        </table></div>
+        <div class="table-wrap" style="margin-top:14px;"><table class="compare-table cols5">
+          <colgroup><col><col><col><col><col></colgroup>
+          <tr><th>Buying one more TH</th><th>Cost per TH</th><th>Profit per TH / year</th><th>ROI / year</th><th>Payback</th></tr>
+          <tbody id="roiThRows"></tbody>
+        </table></div>
+      </div>
+    </details>
 
     <details class="formula">
       <summary>How this is calculated</summary>
       <div class="formula-body">
-        <code>invested     = paid for miners + paid for GMT   (blank = TH × today's ask, GMT held × GMT price)
-yearly profit = 365 × total profit per day  (same as "Where You Stand Today")
+        <code>profit = pool reward × BTC price − maintenance − reinvest fee (2.25% of profit, approximate) + lock rewards
+discount saving = daily maintenance at 0% × discount rate
+lock rewards = POOL × v ÷ (T_others + v),  v = locked GMT × lock-period factor
+
+invested      = paid for miners + paid for GMT   (blank = TH × today's ask, GMT held × GMT price)
+yearly profit = 365 × total profit per day (the row above)
 ROI / year    = yearly profit ÷ invested
 payback       = invested ÷ yearly profit
 break-even BTC = maintenance per day ÷ pool reward (BTC per day)   (mining profit = 0)
@@ -820,7 +815,7 @@ one more TH   = cost per TH ÷ (mining profit per day ÷ TH × 365)</code>
 <section class="tab-panel" role="tabpanel" id="panel-traditional" aria-labelledby="tab-traditional">
 <div class="grid">
 
-  <!-- RESULTS (+ ROI, merged in by JS) -->
+  <!-- RESULTS -->
   <div class="panel results" id="results-traditional">
     <h2>Results</h2>
 
@@ -906,7 +901,7 @@ price cushion = 1 − 360 ÷ total days      (how far GMT can fall before total 
 <section class="tab-panel" role="tabpanel" id="panel-modified" aria-labelledby="tab-modified" hidden>
 <div class="grid">
 
-  <!-- RESULTS (+ ROI, merged in by JS) -->
+  <!-- RESULTS -->
   <div class="panel results" id="results-modified">
     <h2>Results</h2>
 
@@ -1026,7 +1021,7 @@ TH growth after n years = (1 + weekly growth)^(52 n) − 1</code>
     <div class="subtle">Your real APR is lower for a big lock: your own votes dilute the pool.</div>
   </div>
 
-  <!-- RESULTS (+ ROI, merged in by JS) -->
+  <!-- RESULTS -->
   <div class="panel results" id="results-opex">
     <h2>Results</h2>
 
@@ -2256,10 +2251,6 @@ function selectTab(name, fromHash){
     document.getElementById('panel-'+t).hidden = !on;
     document.getElementById('farmTargets-'+t).hidden = !on;
   });
-  // The ROI card is one shared calculator (it doesn't change by strategy), so instead of
-  // duplicating it per tab, move its single DOM node into whichever tab's Results card is
-  // showing right now, where it appears merged in beneath that tab's own Results content.
-  document.getElementById('results-'+name).appendChild(document.getElementById('roiPanel'));
   const link = document.getElementById('strategyLink');
   link.href = STRATEGY_LINKS[name][0];
   link.textContent = STRATEGY_LINKS[name][1];
