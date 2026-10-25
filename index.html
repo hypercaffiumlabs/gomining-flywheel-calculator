@@ -124,6 +124,9 @@ header p{
 }
 .field select:focus{outline:none;border-color:var(--violet-line);}
 .field .warn{color:var(--amber);}
+/* The closed select's background is translucent glass over the page, but the native dropdown
+   popup is always opaque, so color-scheme alone isn't enough: option needs a solid color. */
+select option{background-color:#17122A;color:var(--text);}
 
 .row2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .subtle{font-size:11px;color:var(--dim);margin-top:2px;}
