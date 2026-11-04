@@ -1,8 +1,8 @@
 {
-  "total_votes": 197295038.96,
-  "weekly_pool_gmt": 738282.31,
-  "cycle": "2026-10-27",
-  "changed_at": "2026-10-30T02:34:42Z",
-  "checked_at": "2026-11-03T11:52:57Z",
+  "total_votes": 197268358.79,
+  "weekly_pool_gmt": 712885.91,
+  "cycle": "2026-11-03",
+  "changed_at": "2026-11-04T03:00:10Z",
+  "checked_at": "2026-11-04T03:00:10Z",
   "source": "GoMining app: lock statistics + latest mint cycle (nightly ServiceTap run)"
 }
