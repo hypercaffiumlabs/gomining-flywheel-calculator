@@ -52,6 +52,9 @@ header h1{
   letter-spacing:0.5px;
 }
 header h1 span{color:var(--violet-text);}
+header p.promo{margin-top:6px;font-size:12px;}
+.st-link{color:var(--violet-text);text-decoration:none;}
+.st-link:hover,.st-link:focus-visible{text-decoration:underline;}
 header p{
   margin:0;
   color:var(--dim);
@@ -412,7 +415,8 @@ footer{
 
 <header>
   <h1>GMT Flywheel <span>Calculators</span></h1>
-  <p>Plan a GoMining Flywheel three ways. Enter your farm and the GMT you hold once below; each tab applies a different strategy to the same numbers and tells you what to add.</p>
+  <p>Three Flywheel strategies, one setup. Enter your farm and GMT once, and each tab shows what to add.</p>
+  <p class="promo">Never tap the service button again. <a class="st-link" href="https://github.com/hypercaffiumlabs/gomining-servicetap" target="_blank" rel="noopener" onclick="window.posthog&amp;&amp;posthog.capture('servicetap_link',{where:'header'})">ServiceTap</a> does it for you.</p>
 </header>
 
 <div class="profilebar" id="profileBar">
@@ -515,7 +519,7 @@ footer{
           <option value="2.7">Day 9 — 2.7%</option>
           <option value="3.0">Day 10 — 3.0%</option>
         </select>
-          <div class="subtle">+0.3%/day, resets on any missed day.</div>
+          <div class="subtle">+0.3%/day, resets on any missed day. <a class="st-link" href="https://github.com/hypercaffiumlabs/gomining-servicetap" target="_blank" rel="noopener" onclick="window.posthog&amp;&amp;posthog.capture('servicetap_link',{where:'streak'})">ServiceTap</a> can tap it for you every day.</div>
         </div>
       </div>
       <div class="row2">
