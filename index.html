@@ -52,7 +52,7 @@ header h1{
   letter-spacing:0.5px;
 }
 header h1 span{color:var(--violet-text);}
-header p.promo{margin-top:8px;font-size:17px;}
+header p.promo{margin-top:8px;font-size:min(17px, calc((100vw - 48px) / 21.5));white-space:nowrap;}
 header p.promo .st-link{color:var(--text);}
 .st-link{color:var(--violet-text);text-decoration:none;}
 .st-link:hover,.st-link:focus-visible{text-decoration:underline;}
@@ -417,7 +417,7 @@ footer{
 <header>
   <h1>GMT Flywheel <span>Calculators</span></h1>
   <p>Three Flywheel strategies, one setup. Enter your farm and GMT once, and each tab shows what to add.</p>
-  <p class="promo">Never tap the service button again. <a class="st-link" href="https://github.com/hypercaffiumlabs/gomining-servicetap" target="_blank" rel="noopener" onclick="window.posthog&amp;&amp;posthog.capture('servicetap_link',{where:'header'})">ServiceTap</a> does it for you.</p>
+  <p class="promo"><a class="st-link" href="https://github.com/hypercaffiumlabs/gomining-servicetap" target="_blank" rel="noopener" onclick="window.posthog&amp;&amp;posthog.capture('servicetap_link',{where:'header'})">ServiceTap</a>: Never tap your service button again</p>
 </header>
 
 <div class="profilebar" id="profileBar">
