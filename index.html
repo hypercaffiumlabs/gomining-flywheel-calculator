@@ -52,10 +52,11 @@ header h1{
   letter-spacing:0.5px;
 }
 header h1 span{color:var(--violet-text);}
-header p.promo{margin-top:8px;font-size:min(17px, calc((100vw - 48px) / 21.5));white-space:nowrap;}
-header p.promo .st-link{color:var(--text);}
-.st-link{color:var(--violet-text);text-decoration:none;}
-.st-link:hover,.st-link:focus-visible{text-decoration:underline;}
+header p.promo{margin-top:8px;font-size:min(17px, calc((100vw - 48px) / 23));white-space:nowrap;}
+/* Always underlined + arrow, so it reads as a link on phones (no hover there). */
+.st-link,.subtle a.st-link{color:var(--violet-text);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px;}
+.st-link::after{content:"\00a0\2197";display:inline-block;font-size:.85em;text-decoration:none;}
+.st-link:hover,.st-link:focus-visible{color:var(--text);}
 header p{
   margin:0;
   color:var(--dim);
