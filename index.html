@@ -57,6 +57,8 @@ header p.promo{margin-top:8px;font-size:min(17px, calc((100vw - 48px) / 23));whi
 .st-link,.subtle a.st-link{color:var(--violet-text);text-decoration:underline;text-decoration-thickness:1.5px;text-underline-offset:3px;}
 .st-link::after{content:"\00a0\2197";display:inline-block;font-size:.85em;text-decoration:none;}
 .st-link:hover,.st-link:focus-visible{color:var(--text);}
+header p.promo .st-link{color:var(--text);text-decoration-color:var(--violet-text);}  /* brightest thing on the line */
+header p.promo .st-link:hover,header p.promo .st-link:focus-visible{color:var(--violet-text);}
 header p{
   margin:0;
   color:var(--dim);
