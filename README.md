@@ -18,7 +18,7 @@ The GMT and BTC prices load when the page opens. CoinGecko is tried first; some 
 
 ## Saved setups and share links
 
-Everything you type is saved automatically in **your own browser** (nothing is sent anywhere), so your numbers are still there next visit. The bar above the tabs lets you keep several named setups (for example one per account), switch between them, delete one, or **Reset to defaults**.
+Everything you type is saved automatically in **your own browser** (none of it is sent anywhere; see [Privacy](#privacy-and-visit-counts)), so your numbers are still there next visit. The bar above the tabs lets you keep several named setups (for example one per account), switch between them, delete one, or **Reset to defaults**.
 
 **Copy link** puts your current inputs into a URL. Open it on your phone, or send it to someone: they see your numbers in a banner-marked "shared setup" that is never saved over their own, and can keep it with **Save as my own**.
 
@@ -132,6 +132,28 @@ Both files are kept current by a nightly job in [`gomining-servicetap`](https://
 - `checked_at` is when the values were last verified. If that's **more than 7 days old** (measured with the web server's clock, not the visitor's), the page shows an amber warning instead of "verified", because it usually means the automatic update has stopped.
 - If a file is missing or malformed, the page falls back to built-in defaults and shows the same amber warning. Values must be real numbers within sane ranges, so a null, string or zero can never silently replace them.
 - The pool and total votes move every week. Confirm against GoMining's own Lock Calculator (app.gomining.com → Governance → My lock → Calculate) before relying on any result.
+
+## Privacy and visit counts
+
+The live site counts visits with [PostHog](https://posthog.com), set up to be anonymous:
+
+- **No cookies, and no IP address stored.** Visitors are counted without anything saved in the browser for it, so there's no consent banner.
+- **Nothing you type is ever sent.** No screen recording, no automatic click tracking. Your TH, GMT, prices and dollar amounts never leave the browser.
+- **Page addresses are trimmed first.** Share links carry a whole setup in the address (`?p=…`); that part, and anything else after `?` or `#` except `utm_` tags and the tab name, is removed before sending.
+- **What is counted:** page views and time on page, where visitors came from and their country/device (from PostHog's defaults), and a few named events with small labels, never numbers:
+
+  | Event | Sent when | Label |
+  |---|---|---|
+  | `tab_viewed` | you switch tab | which tab; `click` or `link` |
+  | `share_link_copied` | you click Copy link | the open tab |
+  | `shared_link_opened` | someone opens a share link | — |
+  | `setup_saved` | you save a named setup | `new` or `shared_link` |
+  | `setup_reset` | you click Reset to defaults | — |
+  | `roi_shown` | the ROI section first shows a result (once per visit) | whether a "paid" box is filled in (yes/no) |
+  | `price_feed_failed_gmt` / `_btc` | every live price source failed (once per visit) | whether the placeholder price is in use |
+  | `servicetap_link` | you click a ServiceTap link | where on the page |
+
+- **Only on the live site.** It runs only at `hypercaffiumlabs.github.io`, so a fork or a local copy sends nothing. Browser privacy tools that block PostHog just make you uncounted; the calculator works the same.
 
 ## Not financial advice
 

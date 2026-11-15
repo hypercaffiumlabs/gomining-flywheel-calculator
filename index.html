@@ -1216,6 +1216,19 @@ const BTC_SOURCES = [
   }}
 ];
 let liveGmtSource = null;
+// Usage events for the anonymous visit counts (the PostHog block in <head>). Only fixed names and
+// small labels are ever sent, never a number typed on the page. A no-op off the live site, where
+// window.posthog doesn't exist. trackOnce sends an event at most once per page load.
+function track(name, props){
+  try{ if(window.posthog && typeof posthog.capture === 'function') posthog.capture(name, props || {}); }catch(err){ /* analytics must never break the page */ }
+}
+const trackedOnce = new Set();
+function trackOnce(name, props){
+  if(trackedOnce.has(name)) return;
+  trackedOnce.add(name);
+  track(name, props);
+}
+
 let gmtFetchFailed = false;
 let fetchingLive = false;
 
@@ -1253,6 +1266,7 @@ async function fetchLiveGmtPrice(){
     }else{
       gmtFetchFailed = true;
       updatePriceWarning();
+      trackOnce('price_feed_failed_gmt', {fallback: liveGmtPrice === null});
       if(statusEl){
         statusEl.classList.add('warn');
         statusEl.innerHTML = (liveGmtPrice === null
@@ -1280,6 +1294,7 @@ async function fetchLiveGmtPrice(){
         calc();
       }
     }else if(!btcManual && liveBtcPrice === null){
+      trackOnce('price_feed_failed_btc', {fallback: true});
       setBtcStatus('⚠ Live BTC price unavailable — using $'+fmt(BTC_DEFAULT,0)+' as of '+BTC_DEFAULT_AS_OF+'. Type your own.', true);
     }
   }finally{
@@ -2079,6 +2094,7 @@ function renderRoi(S){
   };
   if(!pr){ clear('Enter your daily pool reward (My Farm) to see your return.'); return; }
   if(!(invested > 0)){ clear('Enter what you paid, or your hashpower and GMT, to see your return.'); return; }
+  trackOnce('roi_shown', {paid_entered: minerPaid !== null || gmtPaid !== null});
 
   const yearly = pr.total*365;
   const roi = yearly/invested;
@@ -2273,8 +2289,11 @@ const STRATEGY_LINKS = {
   opex: ['https://www.reddit.com/r/GoMiningDiscussion/comments/1wl1ycn/build_your_farm_first_before_building_your_army/', 'Read the strategy: Build Your Farm First Before Building Your Army (by u/Aggravating_Zone8984)']
 };
 
+let openTab = null;
 function selectTab(name, fromHash){
   if(!TABS.includes(name)) name = DEFAULT_TAB;
+  if(openTab !== null && openTab !== name) track('tab_viewed', {tab: name, via: fromHash ? 'link' : 'click'});
+  openTab = name;
   TABS.forEach(t=>{
     const on = t === name;
     const tab = document.getElementById('tab-'+t);
@@ -2394,7 +2413,7 @@ function initMiners(){
 
 // ---- Saved setups (this browser only) + share link --------------------------------------------
 // Everything you type is saved in this browser's own storage under a named setup, so it is still
-// there next visit. Nothing is sent anywhere. NOT saved: the GMT and BTC prices (fed live), the
+// there next visit. None of it is sent anywhere. NOT saved: the GMT and BTC prices (fed live), the
 // Mining mode discount and lock pool/votes (fed nightly), and the TH ask price unless typed by hand,
 // so a saved setup can never pin a stale market number.
 const SAVE_KEY = 'gmtFlywheel.saved.v1';
@@ -2610,6 +2629,7 @@ function initSaved(){
     }catch(err){ /* a mangled link: fall through to the saved setup */ }
   }
   if(fromLink){
+    track('shared_link_opened');
     sharedMode = true;
     $id('sharedBanner').hidden = false;
     applySetup(fromLink);
@@ -2626,6 +2646,7 @@ function initSaved(){
     if(saveTimer) saveNow();
     store.profiles.push({name, v:snapshotSetup()});
     store.current = name;
+    track('setup_saved', {from: sharedMode ? 'shared_link' : 'new'});
     if(sharedMode) leaveSharedMode();
     renderProfileBar(); writeStore();
     setPfStatus('Saved as "'+name+'".', 2500);
@@ -2644,10 +2665,12 @@ function initSaved(){
   $id('pfReset').addEventListener('click', ()=>{
     if(!confirm('Reset every input to the defaults? '+(sharedMode ? '' : 'This overwrites the saved setup "'+store.current+'".'))) return;
     applySetup(null);
+    track('setup_reset');
     calc();
   });
   $id('pfCopy').addEventListener('click', ()=>{
     const url = shareLink();
+    track('share_link_copied', {tab: openTab});
     if(navigator.clipboard && navigator.clipboard.writeText){
       navigator.clipboard.writeText(url).then(()=>setPfStatus('Link copied.', 2500), ()=>prompt('Copy this link:', url));
     }else{
@@ -2659,6 +2682,7 @@ function initSaved(){
     if(!name) return;
     store.profiles.push({name, v:snapshotSetup()});
     store.current = name;
+    track('setup_saved', {from: 'shared_link'});
     leaveSharedMode();
     renderProfileBar(); writeStore();
     setPfStatus('Saved as "'+name+'".', 2500);
