@@ -1,5 +1,7 @@
 # GoMining Flywheel Calculators
 
+[![Buy me a coffee](https://img.shields.io/badge/Buy%20me%20a%20coffee-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black)](https://buymeacoffee.com/jdobbsclt)
+
 Single-page, no-build calculators for [GoMining](https://gomining.com) miners planning a **Flywheel**, in three tabs that share the same farm and GMT inputs:
 
 - **Traditional GMT Flywheel** — the rules-based strategy by u/DracoF ([write-up](https://www.reddit.com/r/gomining/comments/1sbqys5/the_flywheel_strategy/)): a status headline and this week's action, a weekly checklist, and the GMT and dollars needed to build 360 locked / 140 unlocked days (described below).
